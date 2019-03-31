@@ -18,7 +18,14 @@ class Backend():
         def send(*args,**kargs):
             selfOrig = args[0]
             selfOrig.finalize()
-            response = requests.request(kargs.get("method"),kargs.get("url"),headers = selfOrig.headers,data=kargs.get("data"))
+            
+            response = requests.request(
+                kargs.get("method"),
+                kargs.get("url"),
+                headers = selfOrig.headers,
+                data=kargs.get("data"),
+                proxies=kargs.get("proxies"))
+
             if response.ok:
                 return response.json()
             else:
