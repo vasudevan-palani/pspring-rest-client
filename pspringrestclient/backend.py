@@ -33,12 +33,9 @@ class Backend():
                 "headers" : selfOrig.headers
             })
 
-            response = requests.request(
-                kargs.get("method"),
-                kargs.get("url"),
-                headers = selfOrig.headers,
-                data=kargs.get("data"),
-                proxies=kargs.get("proxies"))
+            kargs["headers"] = selfOrig.headers
+
+            response = requests.request(**kargs)
 
             try:
                 logger.info({
@@ -49,11 +46,14 @@ class Backend():
                     "proxies" : kargs.get("proxies"),
                     "headers" : selfOrig.headers,
                     "status_code" : response.status_code,
-                    "responseHeaders" : json.loads(response.headers),
+                    "responseHeaders" : json.loads(str(response.headers).replace("'","\"")),
                     "response" : response.json(),
                     "elapsed" : response.elapsed.total_seconds()
                 })
-            except Exception:
+            except Exception as ex:
+                logger.error({
+                    "message" : str(ex)
+                })
                 logger.info({
                     "message" : "response details",
                     "method" : kargs.get("method"),
