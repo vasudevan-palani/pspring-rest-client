@@ -3,6 +3,7 @@ import requests
 from pspring import *
 
 import logging
+import json
 
 logger = logging.getLogger("pspring-rest-client")
 
@@ -48,7 +49,7 @@ class Backend():
                     "proxies" : kargs.get("proxies"),
                     "headers" : selfOrig.headers,
                     "status_code" : response.status_code,
-                    "responseHeaders" : response.headers,
+                    "responseHeaders" : json.loads(response.headers),
                     "response" : response.json(),
                     "elapsed" : response.elapsed.total_seconds()
                 })
