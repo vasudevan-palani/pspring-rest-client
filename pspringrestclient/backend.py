@@ -70,6 +70,11 @@ class Backend():
             if response.ok:
                 return response.json()
             else:
+                if getattr(selfOrig,"handleError",None) != None:
+                    mappedResponse = selfOrig.handleError(response.json())
+                    statusCode = mappedResponse.get("statusCode")
+                    del mappedResponse["statusCode"]
+                    raise PayloadException("backend error",statusCode,mappedResponse)
                 raise PayloadException("backend error",response.status_code,response.text)
 
         def getUrl(*args,**kargs):
