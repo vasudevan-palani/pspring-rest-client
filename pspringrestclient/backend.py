@@ -40,7 +40,6 @@ class Backend():
                 proxies=kargs.get("proxies"))
 
             try:
-                responseJson = json.loads(response.text)
                 logger.info({
                     "message" : "response details",
                     "method" : kargs.get("method"),
@@ -50,7 +49,7 @@ class Backend():
                     "headers" : selfOrig.headers,
                     "status_code" : response.status_code,
                     "responseHeaders" : response.headers,
-                    "response" : responseJson,
+                    "response" : response.json(),
                     "elapsed" : response.elapsed.total_seconds()
                 })
             except Exception:

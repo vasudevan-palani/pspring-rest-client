@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pspring-rest-client',
-    version='0.0.4',
+    version='0.0.5',
     license='TBD',
     author='Vasudevan Palani',
     author_email='vasudevan.palani@gmail.com',
