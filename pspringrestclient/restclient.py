@@ -7,7 +7,14 @@ import json
 
 logger = logging.getLogger("pspring-rest-client")
 
-class Backend():
+class PayloadException(Exception):
+    def __init__(self,*args):
+        super().__init__(*args)
+        self.response = args[2]
+        self.statusCode = args[1]
+
+
+class RestClient():
     def __init__(self,*args,**kargs):
         self.url = kargs.get("url")
 
