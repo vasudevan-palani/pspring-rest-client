@@ -15,19 +15,18 @@ Annotations / Decorators that come along with this framework are listed below
   
 Useful classes in this framework
 
-`RegExResponseMapper` - this class can be used to tranform one dictionary to another using regex. An example is shown below
-
+`RegExResponseMapper` - this class can be used to tranform one dictionary to another using regex. An example is shown below. The source dictionary fields can be accessed using `$` notation. In the below example `message` is a field inside the `response dictionary.
 ```python
 regexmapper = RegExResponseMapper({
     ".*Customer does not exist.*" :  {
         "statusCode" : "404",
         "code" : "APS-1001",
-        "message" : "$message"
+        "message" : "$response.message"
     },
     ".*" : {
         "statusCode" : "500",
         "code" : "APS-1002",
-        "message" : "$message"
+        "message" : "$response.message"
     }
 })
 
