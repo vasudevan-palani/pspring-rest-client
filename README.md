@@ -32,10 +32,10 @@ regexmapper = RegExResponseMapper({
     }
 })
 
-@RestClient("url=https://myapi.com")
+@RestClient(url="https://myapi.com")
 class MyRestClient():
 
-  @Method(method="GET",url="/user/{firstName}")
+  @Mapping(method="GET",url="/user/{firstName}")
   def getCustomer(self,firstName):
     pass
 
