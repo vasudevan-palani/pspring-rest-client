@@ -6,13 +6,15 @@ Annotations / Decorators that come along with this framework are listed below
 
 * `@RestClient(url="")`
   This decorator will add few boiler plate code that is required to interact with any rest endpoint. The methods significant are `send`, `getUrl`, `addHeader`.
-  
+
   The `send` method would accept all arguments that `requests.request` method would. This method will throw `PayloadException` for all not HTTP 200 responses. The `PayloadException` has `response` and `statusCode` attributes which can be further used for error handling.
   The `addHeader(name,value)` method would add an header
   The `getUrl` will get the url that is configured along with `@RestClient` decorator.
   The `handleError` method is exists on the object will be invoked when received a non http 200 response.
-  
-  
+
+* `@Mapping(method="",url="")`
+  This decorator will take care of replacing parameters in the url from arguments passed, send the request and return the response
+
 Useful classes in this framework
 
 `RegExResponseMapper` - this class can be used to tranform one dictionary to another using regex. An example is shown below. The source dictionary fields can be accessed using `$` notation. In the below example `message` is a field inside the `response dictionary.
@@ -32,16 +34,15 @@ regexmapper = RegExResponseMapper({
 
 @RestClient("url=https://myapi.com")
 class MyRestClient():
-  
-  def getCustomer(self):
-    url = self.getUrl()
-    url = url + "/user"
-    return self.send(url=url,method="GET",header=..,proxies=...)
-    
+
+  @Method(method="GET",url="/user/{firstName}")
+  def getCustomer(self,firstName):
+    pass
+
   def handleError(self,response):
         return regexmapper.map(response)
 ```
-  
+
  To do:
- 
+
  * To return objects based on the return type from the response received.

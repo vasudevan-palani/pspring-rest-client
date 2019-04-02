@@ -4,6 +4,7 @@ from pspring import *
 
 import logging
 import json
+import inspect
 
 logger = logging.getLogger("pspring-rest-client")
 
@@ -12,6 +13,34 @@ class PayloadException(Exception):
         super().__init__(*args)
         self.response = args[2]
         self.statusCode = args[1]
+
+class Mapping():
+    def __init__(self,*args,**kargs):
+        self.method = kargs.get("method")
+        self.url = kargs.get("url")
+
+    def __call__(self,funcObj):
+        def newFunc(*args,**kargs):
+            argspec = inspect.getfullargspec(funcObj)
+            argumentNames = argspec[0]
+            print(argumentNames)
+            for i in range(len(argumentNames)):
+                self.url = self.url.replace("{"+argumentNames[i]+"}",str(args[i]))
+
+            for (kargKey,kargVal) in kargs.items():
+                self.url = self.url.replace("{"+kargKey+"}",str(kargVal))
+
+            selfObj = args[0]
+            kargs.update({
+                "url" : selfObj.getUrl()+self.url
+            })
+            kargs.update({
+                "method" : self.method
+            })
+
+            funcObj(*args,**kargs)
+            return selfObj.send(**kargs)
+        return newFunc
 
 
 class RestClient():
