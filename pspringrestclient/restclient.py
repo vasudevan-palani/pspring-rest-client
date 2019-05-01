@@ -23,7 +23,6 @@ class Mapping():
         def newFunc(*args,**kargs):
             argspec = inspect.getfullargspec(funcObj)
             argumentNames = argspec[0]
-            print(argumentNames)
             for i in range(len(argumentNames)):
                 self.url = self.url.replace("{"+argumentNames[i]+"}",str(args[i]))
 
