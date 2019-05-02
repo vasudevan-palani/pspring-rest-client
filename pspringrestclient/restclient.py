@@ -103,9 +103,18 @@ class RestClient():
                 })
 
             if response.ok:
-                return response.json()
+                if "application/json" in response.headers.get("Content-Type"):
+                    return {
+                        "body":response.json(),
+                        "headers" : response.headers
+                    }
+                else:
+                    return {
+                        "body":response.text,
+                        "headers" : response.headers
+                    }
             else:
-                if getattr(selfOrig,"handleError",None) != None:
+                if getattr(selfOrig,"handleError",None) != None and "application/json" in response.headers.get("Content-Type"):
                     mappedResponse = selfOrig.handleError(response.json())
                     statusCode = mappedResponse.get("statusCode")
                     del mappedResponse["statusCode"]
