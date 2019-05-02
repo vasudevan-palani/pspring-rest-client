@@ -1,5 +1,7 @@
 import requests
 
+from requests.exceptions import HTTPError
+
 from pspring import *
 
 import logging
@@ -18,6 +20,7 @@ class Mapping():
     def __init__(self,*args,**kargs):
         self.method = kargs.get("method")
         self.url = kargs.get("url")
+        self.data = kargs.get("data")
 
     def __call__(self,funcObj):
         def newFunc(*args,**kargs):
@@ -37,6 +40,11 @@ class Mapping():
                 "method" : self.method
             })
 
+            if self.data != None:
+                kargs.update({
+                    "data" : self.data
+                })
+
             funcObj(*args,**kargs)
             return selfObj.send(**kargs)
         return newFunc
@@ -45,6 +53,7 @@ class Mapping():
 class RestClient():
     def __init__(self,*args,**kargs):
         self.url = kargs.get("url")
+        self.responsemapper = kargs.get("responsemapper")
 
     def __call__(self,classObj):
         def constructor(*args,**kargs):
@@ -70,9 +79,31 @@ class RestClient():
 
             kargs["headers"] = selfOrig.headers
 
-            response = requests.request(**kargs)
 
             try:
+                response = requests.request(**kargs)
+
+                finalresponse = {}
+                
+                response.raise_for_status()
+
+                if "application/json" in response.headers.get("Content-Type"):
+                    responseJson = response.json()
+                    if self.responsemapper != None:
+                        responseJson = self.responsemapper.map(response.json())
+                    
+                    finalresponse = {
+                        "body":responseJson,
+                        "headers" : response.headers
+                    }
+                
+                else:
+                    
+                    finalresponse = {
+                        "body":response.text,
+                        "headers" : response.headers
+                    }
+
                 logger.info({
                     "message" : "response details",
                     "method" : kargs.get("method"),
@@ -85,7 +116,9 @@ class RestClient():
                     "response" : response.json(),
                     "elapsed" : response.elapsed.total_seconds()
                 })
-            except Exception as ex:
+
+                return finalresponse
+            except HTTPError as ex:
                 logger.error({
                     "message" : str(ex)
                 })
@@ -101,25 +134,9 @@ class RestClient():
                     "response" : response.text,
                     "elapsed" : response.elapsed.total_seconds()
                 })
+                raise ex
 
-            if response.ok:
-                if "application/json" in response.headers.get("Content-Type"):
-                    return {
-                        "body":response.json(),
-                        "headers" : response.headers
-                    }
-                else:
-                    return {
-                        "body":response.text,
-                        "headers" : response.headers
-                    }
-            else:
-                if getattr(selfOrig,"handleError",None) != None and "application/json" in response.headers.get("Content-Type"):
-                    mappedResponse = selfOrig.handleError(response.json())
-                    statusCode = mappedResponse.get("statusCode")
-                    del mappedResponse["statusCode"]
-                    raise PayloadException("backend error",statusCode,mappedResponse)
-                raise PayloadException("backend error",response.status_code,response.text)
+
 
         def getUrl(*args,**kargs):
             selfOrig = args[0]
@@ -132,6 +149,7 @@ class RestClient():
         classObj.addHeader = addHeader
         classObj.send = send
         classObj.getUrl = getUrl
-        classObj.finalize = finalize
+        if not hasattr(classObj,"finalize"):
+            classObj.finalize = finalize
 
         return classObj
