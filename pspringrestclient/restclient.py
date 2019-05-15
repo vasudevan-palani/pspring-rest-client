@@ -43,7 +43,7 @@ class Mapping():
 
             if(self.timeout != None):
                 kargs.update({
-                    "timeout" : int(self.timeout)
+                    "timeout" : float(self.timeout)
                 })
 
             if self.data != None:
@@ -79,7 +79,7 @@ class RestClient():
                 kargs.update(additionalArgs)
 
             if kargs.get("timeout") == None and self.timeout != None:
-                kargs["timeout"] = int(self.timeout)
+                kargs["timeout"] = float(self.timeout)
 
             logger.info({
                 "message" : "request details",
