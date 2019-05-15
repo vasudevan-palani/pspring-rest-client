@@ -40,9 +40,11 @@ class Mapping():
             kargs.update({
                 "method" : self.method
             })
-            kargs.update({
-                "timeout" : int(self.timeout)
-            })
+
+            if(self.timeout != None):
+                kargs.update({
+                    "timeout" : int(self.timeout)
+                })
 
             if self.data != None:
                 kargs.update({
@@ -71,10 +73,17 @@ class RestClient():
 
         def send(*args,**kargs):
             selfOrig = args[0]
-            selfOrig.finalize()
+            additionalArgs = selfOrig.finalize()
+
+            if isinstance(additionalArgs,dict):
+                kargs.update(additionalArgs)
+
+            if kargs.get("timeout") == None and self.timeout != None:
+                kargs["timeout"] = int(self.timeout)
 
             logger.info({
                 "message" : "request details",
+                "timeout" : kargs.get("timeout"),
                 "method" : kargs.get("method"),
                 "url" : kargs.get("url"),
                 "data" : kargs.get("data"),
@@ -84,8 +93,6 @@ class RestClient():
 
             kargs["headers"] = selfOrig.headers
 
-            if kargs.get("timeout") == None and self.timeout != None:
-                kargs["timeout"] = int(self.timeout)
 
 
             try:
