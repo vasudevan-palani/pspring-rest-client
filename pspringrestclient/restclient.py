@@ -21,6 +21,7 @@ class Mapping():
         self.method = kargs.get("method")
         self.url = kargs.get("url")
         self.data = kargs.get("data")
+        self.timeout = kargs.get("timeout")
 
     def __call__(self,funcObj):
         def newFunc(*args,**kargs):
@@ -39,6 +40,9 @@ class Mapping():
             kargs.update({
                 "method" : self.method
             })
+            kargs.update({
+                "timeout" : int(self.timeout)
+            })
 
             if self.data != None:
                 kargs.update({
@@ -53,6 +57,7 @@ class Mapping():
 class RestClient():
     def __init__(self,*args,**kargs):
         self.url = kargs.get("url")
+        self.timeout = kargs.get("timeout")
         self.responsemapper = kargs.get("responsemapper")
 
     def __call__(self,classObj):
@@ -78,6 +83,9 @@ class RestClient():
             })
 
             kargs["headers"] = selfOrig.headers
+
+            if kargs.get("timeout") == None and self.timeout != None:
+                kargs["timeout"] = int(self.timeout)
 
 
             try:
