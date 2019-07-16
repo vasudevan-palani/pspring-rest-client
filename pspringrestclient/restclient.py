@@ -52,6 +52,23 @@ class Mapping():
                 })
 
             funcObj(*args,**kargs)
+
+            if(hasattr(selfObj,"timeout") and selfObj.timeout != None):
+                kargs.update({
+                    "timeout" : float(selfObj.timeout)
+                })
+
+            if (hasattr(selfObj,"data") and selfObj.data != None):
+                kargs.update({
+                    "data" : selfObj.data
+                })
+
+            if (hasattr(selfObj,"json") and selfObj.json != None):
+                kargs.update({
+                    "json" : selfObj.json
+                })
+
+
             return selfObj.send(**kargs)
         return newFunc
 
