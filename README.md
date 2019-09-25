@@ -39,6 +39,14 @@ class MyRestClient():
   def getCustomer(self,firstName):
     pass
 
+  @Mapping(method="POST",url="/user/",data=json)
+  def saveCustomer(self):
+    pass
+
+  @Mapping(method="POST",url="/user/")
+  def saveCustomer(self,customer):
+    self.json=customer
+
   def handleError(self,response):
         return regexmapper.map(response)
 ```
