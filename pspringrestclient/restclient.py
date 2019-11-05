@@ -27,15 +27,16 @@ class Mapping():
         def newFunc(*args,**kargs):
             argspec = inspect.getfullargspec(funcObj)
             argumentNames = argspec[0]
+            url = self.url
             for i in range(len(argumentNames)):
-                self.url = self.url.replace("{"+argumentNames[i]+"}",str(args[i]))
+                url = url.replace("{"+argumentNames[i]+"}",str(args[i]))
 
             for (kargKey,kargVal) in kargs.items():
-                self.url = self.url.replace("{"+kargKey+"}",str(kargVal))
+                url = url.replace("{"+kargKey+"}",str(kargVal))
 
             selfObj = args[0]
             kargs.update({
-                "url" : selfObj.getUrl()+self.url
+                "url" : selfObj.getUrl()+url
             })
             kargs.update({
                 "method" : self.method
@@ -104,6 +105,7 @@ class RestClient():
                 "method" : kargs.get("method"),
                 "url" : kargs.get("url"),
                 "data" : kargs.get("data"),
+                "json" : kargs.get("json"),
                 "proxies" : kargs.get("proxies"),
                 "headers" : selfOrig.headers
             })
@@ -141,6 +143,7 @@ class RestClient():
                     "method" : kargs.get("method"),
                     "url" : kargs.get("url"),
                     "data" : kargs.get("data"),
+                    "json" : kargs.get("json"),
                     "proxies" : kargs.get("proxies"),
                     "headers" : selfOrig.headers,
                     "status_code" : response.status_code,
