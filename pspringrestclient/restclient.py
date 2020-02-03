@@ -54,6 +54,11 @@ class Mapping():
 
             funcObj(*args,**kargs)
 
+            if(hasattr(selfObj,"queryString") and selfObj.queryString != None):
+                kargs.update({
+                    "url" : kargs.get("url") + "?" + selfObj.queryString
+                })
+
             if(hasattr(selfObj,"timeout") and selfObj.timeout != None):
                 kargs.update({
                     "timeout" : float(selfObj.timeout)
