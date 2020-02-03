@@ -77,13 +77,14 @@ class Mapping():
 class RestClient():
     def __init__(self,*args,**kargs):
         self.url = kargs.get("url")
+        self.headers = kargs.get("headers",{})
         self.timeout = kargs.get("timeout")
         self.responsemapper = kargs.get("responsemapper")
 
     def __call__(self,classObj):
         def constructor(*args,**kargs):
             selfOrig = args[0]
-            selfOrig.headers = {}
+            selfOrig.headers = self.headers
             selfOrig.url = self.url
 
         def addHeader(selfOrig,name,value):
