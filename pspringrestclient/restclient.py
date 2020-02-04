@@ -29,7 +29,8 @@ class Mapping():
             argumentNames = argspec[0]
             url = self.url
             for i in range(len(argumentNames)):
-                url = url.replace("{"+argumentNames[i]+"}",str(args[i]))
+                if(len(args) > i ):
+                    url = url.replace("{"+argumentNames[i]+"}",str(args[i]))
 
             for (kargKey,kargVal) in kargs.items():
                 url = url.replace("{"+kargKey+"}",str(kargVal))
