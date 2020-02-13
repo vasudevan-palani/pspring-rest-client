@@ -60,6 +60,11 @@ class Mapping():
                     "url" : kargs.get("url") + "?" + selfObj.queryString
                 })
 
+            if (hasattr(selfObj,"proxies") and selfObj.proxies != None):
+                kargs.update({
+                    "proxies" : selfObj.proxies
+                })
+
             if(hasattr(selfObj,"timeout") and selfObj.timeout != None):
                 kargs.update({
                     "timeout" : float(selfObj.timeout)
