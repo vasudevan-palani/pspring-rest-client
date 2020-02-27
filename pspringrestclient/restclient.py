@@ -53,7 +53,10 @@ class Mapping():
                     "data" : self.data
                 })
 
-            funcObj(*args,**kargs)
+            kargsToUpdate = funcObj(*args,**kargs)
+
+            if(kargs != None):
+                kargs.update(kargsToUpdate)
 
             if(hasattr(selfObj,"queryString") and selfObj.queryString != None):
                 kargs.update({
@@ -125,7 +128,6 @@ class RestClient():
             kargs["headers"] = selfOrig.headers
 
 
-
             try:
                 response = requests.request(**kargs)
 
@@ -133,7 +135,7 @@ class RestClient():
                 
                 response.raise_for_status()
 
-                if "json" in response.headers.get("Content-Type"):
+                if "json" in response.headers.get("Content-Type",""):
                     responseJson = response.json()
                     if self.responsemapper != None:
                         responseJson = self.responsemapper.map(response.json())
