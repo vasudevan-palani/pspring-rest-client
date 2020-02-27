@@ -55,7 +55,7 @@ class Mapping():
 
             kargsToUpdate = funcObj(*args,**kargs)
 
-            if(kargs != None):
+            if(kargs != None and kargsToUpdate != None):
                 kargs.update(kargsToUpdate)
 
             if(hasattr(selfObj,"queryString") and selfObj.queryString != None):
