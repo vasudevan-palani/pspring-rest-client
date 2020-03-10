@@ -144,6 +144,20 @@ class RestClient():
                         "body":responseJson,
                         "headers" : response.headers
                     }
+
+                    logger.info({
+                        "message" : "response details",
+                        "method" : kargs.get("method"),
+                        "url" : kargs.get("url"),
+                        "data" : kargs.get("data"),
+                        "json" : kargs.get("json"),
+                        "proxies" : kargs.get("proxies"),
+                        "headers" : selfOrig.headers,
+                        "status_code" : response.status_code,
+                        "responseHeaders" : json.loads(str(response.headers).replace("'","\"")),
+                        "response" : response.json(),
+                        "elapsed" : response.elapsed.total_seconds()
+                    })
                 
                 else:
                     
@@ -152,19 +166,19 @@ class RestClient():
                         "headers" : response.headers
                     }
 
-                logger.info({
-                    "message" : "response details",
-                    "method" : kargs.get("method"),
-                    "url" : kargs.get("url"),
-                    "data" : kargs.get("data"),
-                    "json" : kargs.get("json"),
-                    "proxies" : kargs.get("proxies"),
-                    "headers" : selfOrig.headers,
-                    "status_code" : response.status_code,
-                    "responseHeaders" : json.loads(str(response.headers).replace("'","\"")),
-                    "response" : response.json(),
-                    "elapsed" : response.elapsed.total_seconds()
-                })
+                    logger.info({
+                        "message" : "response details",
+                        "method" : kargs.get("method"),
+                        "url" : kargs.get("url"),
+                        "data" : kargs.get("data"),
+                        "json" : kargs.get("json"),
+                        "proxies" : kargs.get("proxies"),
+                        "headers" : selfOrig.headers,
+                        "status_code" : response.status_code,
+                        "responseHeaders" : json.loads(str(response.headers).replace("'","\"")),
+                        "response" : response.text,
+                        "elapsed" : response.elapsed.total_seconds()
+                    })
 
                 return finalresponse
             except HTTPError as ex:
