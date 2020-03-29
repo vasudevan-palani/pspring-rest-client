@@ -96,10 +96,12 @@ class RestClient():
         self.responsemapper = kargs.get("responsemapper")
 
     def __call__(self,classObj):
+        prevInit = classObj.__init__
         def constructor(*args,**kargs):
             selfOrig = args[0]
             selfOrig.headers = self.headers
             selfOrig.url = self.url
+            prevInit(*args,**kargs)
 
         def addHeader(selfOrig,name,value):
             selfOrig.headers.update({name:value})
