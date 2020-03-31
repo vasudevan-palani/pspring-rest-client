@@ -19,11 +19,11 @@ logger = logging.getLogger("pspring")
 config.fileConfig("./logging.conf")
 
 @EnableWebsec(scope="esp",header="Authorization")
-@Backend(url="http://esp-api.xsp.comcast.net/api/directory/v1/accountprofile/accountno/ACCOUNT_NUMBER/lobtype/NONE/identitiesrequired/true/rolesrequired/true")
+@Backend(url="")
 class AccountProfileBackend():
 
     def getProfileByAccountNumber(self):
-        url = self.getUrl().replace("ACCOUNT_NUMBER","8155100525240986")
+        url = self.getUrl().replace("ACCOUNT_NUMBER","")
         response = self.send(url=url,method="GET")
         logger.debug(response)
 
