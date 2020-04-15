@@ -156,7 +156,7 @@ class RestClient():
                         "proxies" : kargs.get("proxies"),
                         "headers" : selfOrig.headers,
                         "status_code" : response.status_code,
-                        "responseHeaders" : json.loads(str(response.headers).replace("'","\"")),
+                        "responseHeaders" : str(response.headers),
                         "response" : response.json(),
                         "elapsed" : response.elapsed.total_seconds()
                     })
@@ -177,7 +177,7 @@ class RestClient():
                         "proxies" : kargs.get("proxies"),
                         "headers" : selfOrig.headers,
                         "status_code" : response.status_code,
-                        "responseHeaders" : json.loads(str(response.headers).replace("'","\"")),
+                        "responseHeaders" : str(response.headers),
                         "response" : response.text,
                         "elapsed" : response.elapsed.total_seconds()
                     })
