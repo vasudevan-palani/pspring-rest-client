@@ -134,13 +134,15 @@ class RestClient():
                 response = requests.request(**kargs)
 
                 finalresponse = {}
-                
                 response.raise_for_status()
 
                 if "json" in response.headers.get("Content-Type",""):
-                    responseJson = response.json()
+                    responseJson = {}
+                    if response.status_code != 204:
+                        responseJson = response.json()
+
                     if self.responsemapper != None:
-                        responseJson = self.responsemapper.map(response.json())
+                        responseJson = self.responsemapper.map(responseJson)
                     
                     finalresponse = {
                         "body":responseJson,
@@ -157,7 +159,7 @@ class RestClient():
                         "headers" : selfOrig.headers,
                         "status_code" : response.status_code,
                         "responseHeaders" : str(response.headers),
-                        "response" : response.json(),
+                        "response" : responseJson,
                         "elapsed" : response.elapsed.total_seconds()
                     })
                 
