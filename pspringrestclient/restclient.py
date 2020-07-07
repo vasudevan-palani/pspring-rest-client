@@ -7,6 +7,7 @@ from pspring import *
 import logging
 import json
 import inspect
+from urllib3.connectionpool import HTTPConnectionPool
 
 logger = logging.getLogger("pspring-rest-client")
 
@@ -106,6 +107,15 @@ class RestClient():
         def addHeader(selfOrig,name,value):
             selfOrig.headers.update({name:value})
 
+        def getConnectionPeerName(response):
+            try:
+                if response is not None:
+                    return response.raw._original_response.peer
+            except AttributeError:
+                pass
+
+            return None
+
         def send(*args,**kargs):
             selfOrig = args[0]
             additionalArgs = selfOrig.finalize()
@@ -143,7 +153,7 @@ class RestClient():
 
                     if self.responsemapper != None:
                         responseJson = self.responsemapper.map(responseJson)
-                    
+
                     finalresponse = {
                         "body":responseJson,
                         "headers" : response.headers
@@ -158,13 +168,14 @@ class RestClient():
                         "proxies" : kargs.get("proxies"),
                         "headers" : selfOrig.headers,
                         "status_code" : response.status_code,
+                        "peer": getConnectionPeerName(response),
                         "responseHeaders" : str(response.headers),
                         "response" : responseJson,
                         "elapsed" : response.elapsed.total_seconds()
                     })
-                
+
                 else:
-                    
+
                     finalresponse = {
                         "body":response.text,
                         "headers" : response.headers
@@ -179,6 +190,7 @@ class RestClient():
                         "proxies" : kargs.get("proxies"),
                         "headers" : selfOrig.headers,
                         "status_code" : response.status_code,
+                        "peer": getConnectionPeerName(response),
                         "responseHeaders" : str(response.headers),
                         "response" : response.text,
                         "elapsed" : response.elapsed.total_seconds()
@@ -197,6 +209,7 @@ class RestClient():
                     "proxies" : kargs.get("proxies"),
                     "headers" : selfOrig.headers,
                     "status_code" : response.status_code,
+                    "peer": getConnectionPeerName(response),
                     "responseHeaders" : response.headers,
                     "response" : response.text,
                     "elapsed" : response.elapsed.total_seconds()
@@ -220,3 +233,29 @@ class RestClient():
             classObj.finalize = finalize
 
         return classObj
+
+
+def _make_request(self, conn, method, url, **kwargs):
+    response = self._old_make_request(conn, method, url, **kwargs)
+    sock = getattr(conn, 'sock')
+
+    if sock and getattr(sock, 'socket'):
+        peer_name = sock.socket.getpeername()
+        setattr(response, 'peer', peer_name)
+
+        logger.debug({
+            "message": "Socket available in connection, getting host peer name.",
+            "peer": peer_name
+        })
+    else:
+        setattr(response, 'peer', None)
+
+        logger.debug({
+            "message": "Socket not available in connection to get host peer name."
+        })
+
+    return response
+
+
+HTTPConnectionPool._old_make_request = HTTPConnectionPool._make_request
+HTTPConnectionPool._make_request = _make_request
