@@ -89,19 +89,37 @@ class Mapping():
 
 
 class RestClient():
+    middlewares = []
     def __init__(self,*args,**kargs):
         self.url = kargs.get("url")
         self.headers = kargs.get("headers",{})
+        self.middlewares = kargs.get("middlewares",[])
         self.timeout = kargs.get("timeout")
         self.responsemapper = kargs.get("responsemapper")
 
     def __call__(self,classObj):
         prevInit = classObj.__init__
+
         def constructor(*args,**kargs):
+
             selfOrig = args[0]
+            def middleware(*args,**kargs):
+                index = args[0] if len(args) == 1 else None
+                def newfunc(func_obj):
+                    selfOrig.add_middleware(func_obj,index)
+                    return func_obj
+                return newfunc
             selfOrig.headers = self.headers
             selfOrig.url = self.url
+            selfOrig.middleware = middleware
+            selfOrig.middlewares = RestClient.middlewares+ self.middlewares
             prevInit(*args,**kargs)
+
+        def add_middleware(selfOrig,func_obj,index=None):
+            if index is not None:
+                selfOrig.middlewares.insert(index,func_obj)
+            else:
+                selfOrig.middlewares.append(func_obj)
 
         def addHeader(selfOrig,name,value):
             selfOrig.headers.update({name:value})
@@ -116,6 +134,11 @@ class RestClient():
             if kargs.get("timeout") == None and self.timeout != None:
                 kargs["timeout"] = float(self.timeout)
 
+            kargs["headers"] = selfOrig.headers
+
+            for middleware in selfOrig.middlewares:
+                middleware(kargs,None)
+            
             logger.info({
                 "message" : "request details",
                 "timeout" : kargs.get("timeout"),
@@ -126,10 +149,6 @@ class RestClient():
                 "proxies" : kargs.get("proxies"),
                 "headers" : selfOrig.headers
             })
-
-            kargs["headers"] = selfOrig.headers
-
-
             try:
                 response = requests.request(**kargs)
 
@@ -184,6 +203,8 @@ class RestClient():
                         "elapsed" : response.elapsed.total_seconds()
                     })
 
+                for middleware in reversed(selfOrig.middlewares):
+                    middleware(kargs,finalresponse)
                 return finalresponse
             except HTTPError as ex:
                 logger.error({
