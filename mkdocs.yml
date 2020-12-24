@@ -1,0 +1,9 @@
+docs_dir: content
+nav:
+- Home: index.md
+- Changelog: changelog.md
+- Pspring Rest Client:
+  - Rest Client: pspring-rest-client/rest-client.md
+  - Mapping: pspring-rest-client/mapping.md
+site_name: Pspring Rest Client
+theme: material

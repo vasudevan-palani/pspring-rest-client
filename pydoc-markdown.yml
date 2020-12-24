@@ -1,0 +1,26 @@
+loaders:
+  - type: python
+processors:
+  - type: filter
+  - type: smart
+  - type: crossref
+renderer:
+  type: mkdocs
+  pages:
+    - title: Home
+      name: index
+      source: README.md
+    - title: Changelog
+      name: changelog
+      source: CHANGELOG.md
+    - title: Pspring Rest Client
+      children:
+        - title: Rest Client
+          contents:
+            - pspringrestclient.restclient.*
+        - title: Mapping
+          contents:
+            - pspringrestclient.mapping.*
+  mkdocs_config:
+      site_name: Pspring Rest Client
+      theme: material
