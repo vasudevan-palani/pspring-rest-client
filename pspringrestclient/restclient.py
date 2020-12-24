@@ -1,94 +1,36 @@
+""" Pspring Rest Client module provides an easy interface and decorators to turn any class into a http client
+"""
+import logging
+import json
+import inspect
 import requests
 
 from requests.exceptions import HTTPError
 
 from pspring import *
 
-import logging
-import json
-import inspect
 
 logger = logging.getLogger("pspring-rest-client")
 
 class PayloadException(Exception):
+    """[summary]
+
+    Args:
+        Exception ([type]): [description]
+    """
     def __init__(self,*args):
         super().__init__(*args)
         self.response = args[2]
         self.statusCode = args[1]
 
-class Mapping():
-    def __init__(self,*args,**kargs):
-        self.method = kargs.get("method")
-        self.url = kargs.get("url")
-        self.data = kargs.get("data")
-        self.timeout = kargs.get("timeout")
-
-    def __call__(self,funcObj):
-        def newFunc(*args,**kargs):
-            argspec = inspect.getfullargspec(funcObj)
-            argumentNames = argspec[0]
-            url = self.url
-            for i in range(len(argumentNames)):
-                if(len(args) > i ):
-                    url = url.replace("{"+argumentNames[i]+"}",str(args[i]))
-
-            for (kargKey,kargVal) in kargs.items():
-                url = url.replace("{"+kargKey+"}",str(kargVal))
-
-            selfObj = args[0]
-            kargs.update({
-                "url" : selfObj.getUrl()+url
-            })
-            kargs.update({
-                "method" : self.method
-            })
-
-            if(self.timeout != None):
-                kargs.update({
-                    "timeout" : float(self.timeout)
-                })
-
-            if self.data != None:
-                kargs.update({
-                    "data" : self.data
-                })
-
-            kargsToUpdate = funcObj(*args,**kargs)
-
-            if(kargs != None and kargsToUpdate != None):
-                kargs.update(kargsToUpdate)
-
-            if(hasattr(selfObj,"queryString") and selfObj.queryString != None):
-                kargs.update({
-                    "url" : kargs.get("url") + "?" + selfObj.queryString
-                })
-
-            if (hasattr(selfObj,"proxies") and selfObj.proxies != None):
-                kargs.update({
-                    "proxies" : selfObj.proxies
-                })
-
-            if(hasattr(selfObj,"timeout") and selfObj.timeout != None):
-                kargs.update({
-                    "timeout" : float(selfObj.timeout)
-                })
-
-            if (hasattr(selfObj,"data") and selfObj.data != None):
-                kargs.update({
-                    "data" : selfObj.data
-                })
-
-            if (hasattr(selfObj,"json") and selfObj.json != None):
-                kargs.update({
-                    "json" : selfObj.json
-                })
-
-
-            return selfObj.send(**kargs)
-        return newFunc
-
-
 class RestClient():
+    """ RestClient is a class decorator that adds below capabilities to the class
+        * Adds a method called add_header with which we can add headers to the http request
+        * Adds a method called add_middleware, this method will allow hooks to modify the http request and response before it is returned
+        * Adds a method called send, which will trigger the http request
+        * Adds a method called finalize, which will be a pre-hook before http request is sent
+        * Adds a method called getUrl which retuns the current url
+    """
     middlewares = []
     def __init__(self,*args,**kargs):
         self.url = kargs.get("url")
@@ -235,6 +177,7 @@ class RestClient():
 
         classObj.__init__ = constructor
         classObj.addHeader = addHeader
+        classObj.add_middleware = add_middleware
         classObj.send = send
         classObj.getUrl = getUrl
         if not hasattr(classObj,"finalize"):
