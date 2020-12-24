@@ -106,3 +106,26 @@ def test_mapping_get():
         response = testClient.get_users()
         logger.info(response)
         assert response.get("body",None) != None
+
+def test_mapping_query_string():
+    """test query string set manually
+    """
+    with mock.patch("requests.request") as mock_get:
+        mock_get.return_value = MockResponse()
+
+        @RestClient(url="https://reqres.in")
+        class Test():
+            @Mapping(url="/api/users",method="GET")
+            def get_users(self,page_number,*args,**kargs):
+                self.queryString = "page=4"
+        
+        test_client = Test()
+        def send_decorator(func_obj):
+            def new_send(*args,**kargs):
+                self = test_client
+                self.kargs = kargs
+                func_obj(*args,**kargs)
+            return new_send
+        test_client.send = send_decorator(test_client.send)
+        response = test_client.get_users(1)
+        assert test_client.kargs.get("url") == "https://reqres.in/api/users?page=4"
