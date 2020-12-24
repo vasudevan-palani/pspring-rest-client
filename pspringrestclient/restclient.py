@@ -39,46 +39,46 @@ class RestClient():
         self.timeout = kargs.get("timeout")
         self.responsemapper = kargs.get("responsemapper")
 
-    def __call__(self,classObj):
-        prevInit = classObj.__init__
+    def __call__(self,class_obj):
+        prev_init = class_obj.__init__
 
         def constructor(*args,**kargs):
 
-            selfOrig = args[0]
+            self_orig = args[0]
             def middleware(*args,**kargs):
                 index = args[0] if len(args) == 1 else None
                 def newfunc(func_obj):
-                    selfOrig.add_middleware(func_obj,index)
+                    self_orig.add_middleware(func_obj,index)
                     return func_obj
                 return newfunc
-            selfOrig.headers = self.headers
-            selfOrig.url = self.url
-            selfOrig.middleware = middleware
-            selfOrig.middlewares = RestClient.middlewares+ self.middlewares
-            prevInit(*args,**kargs)
+            self_orig.headers = self.headers
+            self_orig.url = self.url
+            self_orig.middleware = middleware
+            self_orig.middlewares = RestClient.middlewares+ self.middlewares
+            prev_init(*args,**kargs)
 
-        def add_middleware(selfOrig,func_obj,index=None):
+        def add_middleware(self_orig,func_obj,index=None):
             if index is not None:
-                selfOrig.middlewares.insert(index,func_obj)
+                self_orig.middlewares.insert(index,func_obj)
             else:
-                selfOrig.middlewares.append(func_obj)
+                self_orig.middlewares.append(func_obj)
 
-        def addHeader(selfOrig,name,value):
-            selfOrig.headers.update({name:value})
+        def addHeader(self_orig,name,value):
+            self_orig.headers.update({name:value})
 
         def send(*args,**kargs):
-            selfOrig = args[0]
-            additionalArgs = selfOrig.finalize()
+            self_orig = args[0]
+            additional_args = self_orig.finalize()
 
-            if isinstance(additionalArgs,dict):
-                kargs.update(additionalArgs)
+            if isinstance(additional_args,dict):
+                kargs.update(additional_args)
 
             if kargs.get("timeout") == None and self.timeout != None:
                 kargs["timeout"] = float(self.timeout)
 
-            kargs["headers"] = selfOrig.headers
+            kargs["headers"] = self_orig.headers
 
-            for middleware in selfOrig.middlewares:
+            for middleware in self_orig.middlewares:
                 middleware(kargs,None)
             
             logger.info({
@@ -89,7 +89,7 @@ class RestClient():
                 "data" : kargs.get("data"),
                 "json" : kargs.get("json"),
                 "proxies" : kargs.get("proxies"),
-                "headers" : selfOrig.headers
+                "headers" : self_orig.headers
             })
             try:
                 response = requests.request(**kargs)
@@ -98,15 +98,15 @@ class RestClient():
                 response.raise_for_status()
 
                 if "json" in response.headers.get("Content-Type",""):
-                    responseJson = {}
+                    response_json = {}
                     if response.status_code != 204:
-                        responseJson = response.json()
+                        response_json = response.json()
 
                     if self.responsemapper != None:
-                        responseJson = self.responsemapper.map(responseJson)
+                        response_json = self.responsemapper.map(response_json)
                     
                     finalresponse = {
-                        "body":responseJson,
+                        "body":response_json,
                         "headers" : response.headers
                     }
 
@@ -117,10 +117,10 @@ class RestClient():
                         "data" : kargs.get("data"),
                         "json" : kargs.get("json"),
                         "proxies" : kargs.get("proxies"),
-                        "headers" : selfOrig.headers,
+                        "headers" : self_orig.headers,
                         "status_code" : response.status_code,
                         "responseHeaders" : str(response.headers),
-                        "response" : responseJson,
+                        "response" : response_json,
                         "elapsed" : response.elapsed.total_seconds()
                     })
                 
@@ -138,14 +138,14 @@ class RestClient():
                         "data" : kargs.get("data"),
                         "json" : kargs.get("json"),
                         "proxies" : kargs.get("proxies"),
-                        "headers" : selfOrig.headers,
+                        "headers" : self_orig.headers,
                         "status_code" : response.status_code,
                         "responseHeaders" : str(response.headers),
                         "response" : response.text,
                         "elapsed" : response.elapsed.total_seconds()
                     })
 
-                for middleware in reversed(selfOrig.middlewares):
+                for middleware in reversed(self_orig.middlewares):
                     middleware(kargs,finalresponse)
                 return finalresponse
             except HTTPError as ex:
@@ -158,7 +158,7 @@ class RestClient():
                     "url" : kargs.get("url"),
                     "data" : kargs.get("data"),
                     "proxies" : kargs.get("proxies"),
-                    "headers" : selfOrig.headers,
+                    "headers" : self_orig.headers,
                     "status_code" : response.status_code,
                     "responseHeaders" : response.headers,
                     "response" : response.text,
@@ -169,18 +169,18 @@ class RestClient():
 
 
         def getUrl(*args,**kargs):
-            selfOrig = args[0]
-            return selfOrig.url
+            self_orig = args[0]
+            return self_orig.url
 
         def finalize(*args,**kargs):
             pass
 
-        classObj.__init__ = constructor
-        classObj.addHeader = addHeader
-        classObj.add_middleware = add_middleware
-        classObj.send = send
-        classObj.getUrl = getUrl
-        if not hasattr(classObj,"finalize"):
-            classObj.finalize = finalize
+        class_obj.__init__ = constructor
+        class_obj.addHeader = addHeader
+        class_obj.add_middleware = add_middleware
+        class_obj.send = send
+        class_obj.getUrl = getUrl
+        if not hasattr(class_obj,"finalize"):
+            class_obj.finalize = finalize
 
-        return classObj
+        return class_obj

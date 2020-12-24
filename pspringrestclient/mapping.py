@@ -46,21 +46,21 @@ class Mapping():
         self.data = kargs.get("data")
         self.timeout = kargs.get("timeout")
 
-    def __call__(self,funcObj):
-        def newFunc(*args,**kargs):
-            argspec = inspect.getfullargspec(funcObj)
-            argumentNames = argspec[0]
+    def __call__(self,func_obj):
+        def new_func(*args,**kargs):
+            argspec = inspect.getfullargspec(func_obj)
+            argument_names = argspec[0]
             url = self.url
-            for i in range(len(argumentNames)):
+            for i in range(len(argument_names)):
                 if(len(args) > i ):
-                    url = url.replace("{"+argumentNames[i]+"}",str(args[i]))
+                    url = url.replace("{"+argument_names[i]+"}",str(args[i]))
 
-            for (kargKey,kargVal) in kargs.items():
-                url = url.replace("{"+kargKey+"}",str(kargVal))
+            for (karg_key,karg_val) in kargs.items():
+                url = url.replace("{"+karg_key+"}",str(karg_val))
 
-            selfObj = args[0]
+            self_obj = args[0]
             kargs.update({
-                "url" : selfObj.getUrl()+url
+                "url" : self_obj.getUrl()+url
             })
             kargs.update({
                 "method" : self.method
@@ -76,36 +76,36 @@ class Mapping():
                     "data" : self.data
                 })
 
-            kargsToUpdate = funcObj(*args,**kargs)
+            kargs_to_update = func_obj(*args,**kargs)
 
-            if(kargs != None and kargsToUpdate != None):
-                kargs.update(kargsToUpdate)
+            if(kargs != None and kargs_to_update != None):
+                kargs.update(kargs_to_update)
 
-            if(hasattr(selfObj,"queryString") and selfObj.queryString != None):
+            if(hasattr(self_obj,"queryString") and self_obj.queryString != None):
                 kargs.update({
-                    "url" : kargs.get("url") + "?" + selfObj.queryString
+                    "url" : kargs.get("url") + "?" + self_obj.queryString
                 })
 
-            if (hasattr(selfObj,"proxies") and selfObj.proxies != None):
+            if (hasattr(self_obj,"proxies") and self_obj.proxies != None):
                 kargs.update({
-                    "proxies" : selfObj.proxies
+                    "proxies" : self_obj.proxies
                 })
 
-            if(hasattr(selfObj,"timeout") and selfObj.timeout != None):
+            if(hasattr(self_obj,"timeout") and self_obj.timeout != None):
                 kargs.update({
-                    "timeout" : float(selfObj.timeout)
+                    "timeout" : float(self_obj.timeout)
                 })
 
-            if (hasattr(selfObj,"data") and selfObj.data != None):
+            if (hasattr(self_obj,"data") and self_obj.data != None):
                 kargs.update({
-                    "data" : selfObj.data
+                    "data" : self_obj.data
                 })
 
-            if (hasattr(selfObj,"json") and selfObj.json != None):
+            if (hasattr(self_obj,"json") and self_obj.json != None):
                 kargs.update({
-                    "json" : selfObj.json
+                    "json" : self_obj.json
                 })
 
 
-            return selfObj.send(**kargs)
-        return newFunc
+            return self_obj.send(**kargs)
+        return new_func
