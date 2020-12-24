@@ -357,12 +357,14 @@
 <h2 id="restclient-objects">RestClient Objects</h2>
 <pre><code class="language-python">class RestClient()
 </code></pre>
-<p>RestClient is a class decorator that adds below capabilities to the class
-* Adds a method called add_header with which we can add headers to the http request
-* Adds a method called add_middleware, this method will allow hooks to modify the http request and response before it is returned
-* Adds a method called send, which will trigger the http request
-* Adds a method called finalize, which will be a pre-hook before http request is sent
-* Adds a method called getUrl which retuns the current url</p>
+<p>RestClient is a class decorator that adds below capabilities to the class</p>
+<ul>
+<li>Adds a method called add_header with which we can add headers to the http request</li>
+<li>Adds a method called add_middleware, this method will allow hooks to modify the http request and response before it is returned</li>
+<li>Adds a method called send, which will trigger the http request</li>
+<li>Adds a method called finalize, which will be a pre-hook before http request is sent</li>
+<li>Adds a method called getUrl which retuns the current url</li>
+</ul>
                 
               
               

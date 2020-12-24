@@ -32,6 +32,7 @@ class Mapping():
 
         ```
         The list of features of the mapping decorator are
+        
         * provides easy access to make methods of a class that send http requests
         * kargs that are recognized are, method, url, data, timeout
         * can have dynamic variables in the url which will be evaluated with the function arguments

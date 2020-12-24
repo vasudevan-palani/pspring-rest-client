@@ -51,6 +51,8 @@ class MyRestClient():
         return regexmapper.map(response)
 ```
 
+Documentation at [pspring-rest-client](https://vasudevan-palani.github.io/pspring-rest-client/)
+
  To do:
 
  * To return objects based on the return type from the response received.

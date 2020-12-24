@@ -4,6 +4,7 @@ Changelog
 
 (unreleased)
 ------------
+- Added github pages doc. [vpalan799]
 - Updated naming conventions. [vpalan799]
 - Added some more tests. [vpalan799]
 - Added unit tests. [vpalan799]

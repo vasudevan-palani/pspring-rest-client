@@ -25,6 +25,7 @@ class PayloadException(Exception):
 
 class RestClient():
     """ RestClient is a class decorator that adds below capabilities to the class
+    
         * Adds a method called add_header with which we can add headers to the http request
         * Adds a method called add_middleware, this method will allow hooks to modify the http request and response before it is returned
         * Adds a method called send, which will trigger the http request
