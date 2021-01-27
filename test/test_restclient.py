@@ -55,6 +55,28 @@ def test_restclient_add_middleware():
         response = test_client.send(url="https://abc.com/users", method="GET")
         assert test_client.headers.get("timestamp") == "12345"
 
+def test_restclient_class_middleware():
+    """Test for class level middlewares
+    """
+    with mock.patch("requests.request") as mock_get:
+        mock_get.return_value = MockResponse()
+
+        @RestClient(url="https://reqres.in")
+        class Test():
+            middlewares=[]
+            """ Test client
+            """
+            pass
+
+        def add_timestamp_middleware(request, response):
+            headers = request.get("headers")
+            headers["timestamp"] = "12345"
+
+        Test.middlewares.append(add_timestamp_middleware)
+        test_client = Test()
+        response = test_client.send(url="https://abc.com/users", method="GET")
+        assert test_client.headers.get("timestamp") == "12345"
+
 
 def test_restclient_finalize():
     """Test for finalize method

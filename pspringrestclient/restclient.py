@@ -55,7 +55,10 @@ class RestClient():
             self_orig.headers = self.headers
             self_orig.url = self.url
             self_orig.middleware = middleware
-            self_orig.middlewares = RestClient.middlewares+ self.middlewares
+            if(hasattr(self_orig,"middlewares") and self_orig.middlewares is not None):
+                self_orig.middlewares = self_orig.middlewares + RestClient.middlewares+ self.middlewares
+            else:
+                self_orig.middlewares = RestClient.middlewares+ self.middlewares
             prev_init(*args,**kargs)
 
         def add_middleware(self_orig,func_obj,index=None):
