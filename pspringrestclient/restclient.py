@@ -70,6 +70,9 @@ class RestClient():
         def addHeader(self_orig,name,value):
             self_orig.headers.update({name:value})
 
+        def clearHeader(self_orig):
+            self_orig.headers = {}
+
         def send(*args,**kargs):
             self_orig = args[0]
             additional_args = self_orig.finalize()
@@ -192,6 +195,7 @@ class RestClient():
 
         class_obj.__init__ = constructor
         class_obj.addHeader = addHeader
+        class_obj.clearHeader = clearHeader
         class_obj.add_middleware = add_middleware
         class_obj.send = send
         class_obj.getUrl = getUrl
