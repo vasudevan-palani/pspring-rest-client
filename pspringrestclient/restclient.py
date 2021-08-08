@@ -40,6 +40,19 @@ class RestClient():
         self.timeout = kargs.get("timeout")
         self.responsemapper = kargs.get("responsemapper")
 
+    def __getattribute__(self, name):
+        """
+        Called for every attribute access in this class.
+        Allows callback functions to be passed as values for instance variables by replacing the instance variable
+        access functionality with an additional check for whether the instance variable is a callback, calling it and
+        returning its result if it is.
+        """
+        attribute_value = object.__getattribute__(self, name)  # Existing behavior
+        if name not in type(self).__dict__.keys() and callable(attribute_value):  # First condition ensures that class methods are never called here.
+            return attribute_value()
+        else:
+            return attribute_value
+            
     def __call__(self,class_obj):
         prev_init = class_obj.__init__
 
