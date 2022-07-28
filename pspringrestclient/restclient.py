@@ -188,8 +188,9 @@ class RestClient():
                 if hasattr(self_orig,"get_error_code"):
                     try:
                         if "json" in response.headers.get("Content-Type",""):
-                            error_code = self_orig.get_error_code(ex.response.json())
+                            error_code, error_message = self_orig.get_error_code(ex.response.json())
                             ex.code = error_code
+                            ex.message = error_message
                     except Exception as excep_code:
                         excep_code_str = str(excep_code)
                         logger.error({
