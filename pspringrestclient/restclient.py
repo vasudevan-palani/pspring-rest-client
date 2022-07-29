@@ -39,6 +39,7 @@ class RestClient():
         self.middlewares = kargs.get("middlewares",[])
         self.timeout = kargs.get("timeout")
         self.responsemapper = kargs.get("responsemapper")
+        self.token = kargs.get("token")
 
     def __getattribute__(self, name):
         """
@@ -86,6 +87,12 @@ class RestClient():
         def clearHeader(self_orig):
             self_orig.headers = {}
 
+        def addToken(self_orig, token):
+            self_orig.token = token
+        
+        def clearToken(self_orig):
+            self_orig.token = None
+
         def send(*args,**kargs):
             self_orig = args[0]
             additional_args = self_orig.finalize()
@@ -99,7 +106,7 @@ class RestClient():
             kargs["headers"] = self_orig.headers
 
             for middleware in self_orig.middlewares:
-                middleware(kargs,None)
+                middleware(kargs, self_orig.token)
             
             logger.info({
                 "message" : "request details",
@@ -167,6 +174,7 @@ class RestClient():
 
                 for middleware in reversed(self_orig.middlewares):
                     middleware(kargs,finalresponse)
+                self_orig.clearToken()
                 return finalresponse
             except HTTPError as ex:
                 logger.error({
@@ -213,6 +221,8 @@ class RestClient():
         class_obj.add_middleware = add_middleware
         class_obj.send = send
         class_obj.getUrl = getUrl
+        class_obj.addToken = addToken
+        class_obj.clearToken = clearToken
         if not hasattr(class_obj,"finalize"):
             class_obj.finalize = finalize
 
