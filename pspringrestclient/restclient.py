@@ -98,6 +98,10 @@ class RestClient():
 
             kargs["headers"] = self_orig.headers
 
+            original_url = kargs["headers"].get("original_url")
+            if kargs["headers"].get("original_url"):
+                del kargs["headers"]["original_url"]
+
             for middleware in self_orig.middlewares:
                 middleware(kargs,None)
             
@@ -133,6 +137,7 @@ class RestClient():
                     logger.info({
                         "message" : "response details",
                         "method" : kargs.get("method"),
+                        "original_url" : original_url,
                         "url" : kargs.get("url"),
                         "data" : kargs.get("data"),
                         "json" : kargs.get("json"),
@@ -154,6 +159,7 @@ class RestClient():
                     logger.info({
                         "message" : "response details",
                         "method" : kargs.get("method"),
+                        "original_url" : original_url,
                         "url" : kargs.get("url"),
                         "data" : kargs.get("data"),
                         "json" : kargs.get("json"),
@@ -175,6 +181,7 @@ class RestClient():
                 logger.info({
                     "message" : "response details",
                     "method" : kargs.get("method"),
+                    "original_url" : original_url,
                     "url" : kargs.get("url"),
                     "data" : kargs.get("data"),
                     "proxies" : kargs.get("proxies"),
