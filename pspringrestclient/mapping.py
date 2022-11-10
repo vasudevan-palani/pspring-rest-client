@@ -52,6 +52,7 @@ class Mapping():
             argspec = inspect.getfullargspec(func_obj)
             argument_names = argspec[0]
             url = self.url
+            orig_url = self.url
             for i in range(len(argument_names)):
                 if(len(args) > i ):
                     url = url.replace("{"+argument_names[i]+"}",str(args[i]))
@@ -60,6 +61,10 @@ class Mapping():
                 url = url.replace("{"+karg_key+"}",str(karg_val))
 
             self_obj = args[0]
+
+            # pass the original url in headers so we can log in response details
+            self_obj.addHeader("original_url", self_obj.getUrl() + orig_url)
+
             kargs.update({
                 "url" : self_obj.getUrl()+url
             })
